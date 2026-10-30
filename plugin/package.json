@@ -1,11 +1,11 @@
 {
   "name": "dsh-balance-pocket",
   "version": "0.1.0",
-  "description": "DSH 侧栏底部余额入口：向上弹出小窗，实时显示 DeepSeek 余额、峰谷时段与今日已用。DSH sidebar balance pocket with a live upward popover for the DeepSeek balance, peak/off-peak pricing and today's spend.",
+  "description": "DSH 渚ф爮搴曢儴浣欓鍏ュ彛锛氬悜涓婂脊鍑哄皬绐楋紝瀹炴椂鏄剧ず DeepSeek 浣欓銆佸嘲璋锋椂娈典笌浠婃棩宸茬敤銆侱SH sidebar balance pocket with a live upward popover for the DeepSeek balance, peak/off-peak pricing and today's spend.",
   "type": "module",
   "main": "./index.js",
   "license": "MIT",
-  "author": "LMC111-div",
+  "author": "Llii-div",
   "keywords": [
     "dsh",
     "dsh-plugin",
@@ -18,12 +18,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LMC111-div/dsh-balance-pocket.git",
+    "url": "git+https://github.com/Llii-div/dsh-balance-pocket.git",
     "directory": "plugin"
   },
-  "homepage": "https://github.com/LMC111-div/dsh-balance-pocket#readme",
+  "homepage": "https://github.com/Llii-div/dsh-balance-pocket#readme",
   "bugs": {
-    "url": "https://github.com/LMC111-div/dsh-balance-pocket/issues"
+    "url": "https://github.com/Llii-div/dsh-balance-pocket/issues"
   },
   "engines": {
     "node": ">=18"

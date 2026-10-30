@@ -1,58 +1,41 @@
-# 安全策略 · Security Policy
+# 瀹夊叏绛栫暐 路 Security Policy
 
-## 支持范围
+## 鏀寔鑼冨洿
 
-| 版本 | 支持 |
+| 鐗堟湰 | 鏀寔 |
 |---|---|
-| 0.1.x | ✅ 接受安全报告 |
-| < 0.1.0 | ❌ 不提供支持 |
+| 0.1.x | 鉁?鎺ュ彈瀹夊叏鎶ュ憡 |
+| < 0.1.0 | 鉂?涓嶆彁渚涙敮鎸?|
 
-## 报告漏洞
+## 鎶ュ憡婕忔礊
 
-**请不要开公开 Issue。** 请使用 GitHub 的私密漏洞报告：
+**璇蜂笉瑕佸紑鍏紑 Issue銆?* 璇蜂娇鐢?GitHub 鐨勭瀵嗘紡娲炴姤鍛婏細
 
-👉 https://github.com/LMC111-div/dsh-balance-pocket/security/advisories/new
+馃憠 https://github.com/Llii-div/dsh-balance-pocket/security/advisories/new
 
-报告里请包含：受影响的版本、复现步骤、影响描述，以及（如有）最小 PoC。
-**不要**附带真实的 `DEEPSEEK_API_KEY`、账号 token 或完整账本文件；如需展示，请打码或使用伪造值。
+鎶ュ憡閲岃鍖呭惈锛氬彈褰卞搷鐨勭増鏈€佸鐜版楠ゃ€佸奖鍝嶆弿杩帮紝浠ュ強锛堝鏈夛級鏈€灏?PoC銆?**涓嶈**闄勫甫鐪熷疄鐨?`DEEPSEEK_API_KEY`銆佽处鍙?token 鎴栧畬鏁磋处鏈枃浠讹紱濡傞渶灞曠ず锛岃鎵撶爜鎴栦娇鐢ㄤ吉閫犲€笺€?
+鎴戜細灏藉揩纭鏀跺埌骞惰瘎浼板奖鍝嶏紱淇鍙戝竷鍚庝細鍦?Advisory 涓?CHANGELOG 涓嚧璋紙闄ら潪浣犲笇鏈涘尶鍚嶏級銆?
+## 璁捐涓婄殑瀹夊叏杈圭晫
 
-我会尽快确认收到并评估影响；修复发布后会在 Advisory 与 CHANGELOG 中致谢（除非你希望匿名）。
-
-## 设计上的安全边界
-
-这个插件处理余额与凭据，因此以下约束属于**安全契约**，任何改动都不得削弱：
-
-1. **凭据不出 Host 端**：`DEEPSEEK_API_KEY` / 账号 token 只用于向 DeepSeek 官方接口发请求，
-   不得出现在快照响应、日志、错误文案、DOM 或账本文件中。
-2. **快照路由两层信任**：先校验 `Host` 必须为回环地址（`localhost` / `127.0.0.0/8` / `::1`）、
-   `Sec-Fetch-Site` 不得为 `cross-site`、带 `Origin` 时必须与 `Host` 同源；随后在 Harness 提供
-   `connection.requestRejection` 时**委托**宿主栅栏（它知道 `--trusted-host` 与反向代理），
-   栅栏抛异常一律按拒绝处理（fail-closed）。仅在没有栅栏的老 Harness 上，
-   才回落到 `DSH_BALANCE_POCKET_TRUSTED_HOSTS` 显式放行列表 ——
-   **放行后同网段任何能访问该地址的设备都能读取余额**，属于用户显式选择加入的风险。
-3. **只读**：插件不写 profile、不改其他插件数据；唯一的落盘是 `$DSH_HOME/dsh-balance-pocket/ledger.json`，
-   内容只有日期、余额数值、币种和来源标识。
-4. **最小依赖**：Host 与 Client 都不引入第三方运行时依赖，客户端无构建、无远程脚本。
-5. **错误不泄露内部信息**：路由任何内部失败都返回 200 + 通用错误文案，不返回堆栈、路径或凭据。
-6. **不假装知道**：钱包字段缺失时判为「不可用」而不是 `0`；节假日表未覆盖的年份会在界面明确提示，
-   复用过期读数会标注延迟时间 —— 宁可显示「不知道」，也不给用户一个看起来确定但错误的值。
-
-## 不在范围内
-
-- 需要用户先安装恶意插件/修改系统才能触发的攻击；
-- DeepSeek 官方接口自身的安全问题（请报告给 DeepSeek）；
-- 已明确标注为「仅提示、不参与计费」的展示逻辑。
-
+杩欎釜鎻掍欢澶勭悊浣欓涓庡嚟鎹紝鍥犳浠ヤ笅绾︽潫灞炰簬**瀹夊叏濂戠害**锛屼换浣曟敼鍔ㄩ兘涓嶅緱鍓婂急锛?
+1. **鍑嵁涓嶅嚭 Host 绔?*锛歚DEEPSEEK_API_KEY` / 璐﹀彿 token 鍙敤浜庡悜 DeepSeek 瀹樻柟鎺ュ彛鍙戣姹傦紝
+   涓嶅緱鍑虹幇鍦ㄥ揩鐓у搷搴斻€佹棩蹇椼€侀敊璇枃妗堛€丏OM 鎴栬处鏈枃浠朵腑銆?2. **蹇収璺敱涓ゅ眰淇′换**锛氬厛鏍￠獙 `Host` 蹇呴』涓哄洖鐜湴鍧€锛坄localhost` / `127.0.0.0/8` / `::1`锛夈€?   `Sec-Fetch-Site` 涓嶅緱涓?`cross-site`銆佸甫 `Origin` 鏃跺繀椤讳笌 `Host` 鍚屾簮锛涢殢鍚庡湪 Harness 鎻愪緵
+   `connection.requestRejection` 鏃?*濮旀墭**瀹夸富鏍呮爮锛堝畠鐭ラ亾 `--trusted-host` 涓庡弽鍚戜唬鐞嗭級锛?   鏍呮爮鎶涘紓甯镐竴寰嬫寜鎷掔粷澶勭悊锛坒ail-closed锛夈€備粎鍦ㄦ病鏈夋爡鏍忕殑鑰?Harness 涓婏紝
+   鎵嶅洖钀藉埌 `DSH_BALANCE_POCKET_TRUSTED_HOSTS` 鏄惧紡鏀捐鍒楄〃 鈥斺€?   **鏀捐鍚庡悓缃戞浠讳綍鑳借闂鍦板潃鐨勮澶囬兘鑳借鍙栦綑棰?*锛屽睘浜庣敤鎴锋樉寮忛€夋嫨鍔犲叆鐨勯闄┿€?3. **鍙**锛氭彃浠朵笉鍐?profile銆佷笉鏀瑰叾浠栨彃浠舵暟鎹紱鍞竴鐨勮惤鐩樻槸 `$DSH_HOME/dsh-balance-pocket/ledger.json`锛?   鍐呭鍙湁鏃ユ湡銆佷綑棰濇暟鍊笺€佸竵绉嶅拰鏉ユ簮鏍囪瘑銆?4. **鏈€灏忎緷璧?*锛欻ost 涓?Client 閮戒笉寮曞叆绗笁鏂硅繍琛屾椂渚濊禆锛屽鎴风鏃犳瀯寤恒€佹棤杩滅▼鑴氭湰銆?5. **閿欒涓嶆硠闇插唴閮ㄤ俊鎭?*锛氳矾鐢变换浣曞唴閮ㄥけ璐ラ兘杩斿洖 200 + 閫氱敤閿欒鏂囨锛屼笉杩斿洖鍫嗘爤銆佽矾寰勬垨鍑嵁銆?6. **涓嶅亣瑁呯煡閬?*锛氶挶鍖呭瓧娈电己澶辨椂鍒や负銆屼笉鍙敤銆嶈€屼笉鏄?`0`锛涜妭鍋囨棩琛ㄦ湭瑕嗙洊鐨勫勾浠戒細鍦ㄧ晫闈㈡槑纭彁绀猴紝
+   澶嶇敤杩囨湡璇绘暟浼氭爣娉ㄥ欢杩熸椂闂?鈥斺€?瀹佸彲鏄剧ず銆屼笉鐭ラ亾銆嶏紝涔熶笉缁欑敤鎴蜂竴涓湅璧锋潵纭畾浣嗛敊璇殑鍊笺€?
+## 涓嶅湪鑼冨洿鍐?
+- 闇€瑕佺敤鎴峰厛瀹夎鎭舵剰鎻掍欢/淇敼绯荤粺鎵嶈兘瑙﹀彂鐨勬敾鍑伙紱
+- DeepSeek 瀹樻柟鎺ュ彛鑷韩鐨勫畨鍏ㄩ棶棰橈紙璇锋姤鍛婄粰 DeepSeek锛夛紱
+- 宸叉槑纭爣娉ㄤ负銆屼粎鎻愮ず銆佷笉鍙備笌璁¤垂銆嶇殑灞曠ず閫昏緫銆?
 ## English
 
 Report vulnerabilities privately via GitHub Security Advisories
-(https://github.com/LMC111-div/dsh-balance-pocket/security/advisories/new), never in a public issue.
+(https://github.com/Llii-div/dsh-balance-pocket/security/advisories/new), never in a public issue.
 Do not include real API keys or tokens. Supported versions: 0.1.x.
 
 Security contract: credentials never leave the Host process and never appear in responses/logs/DOM;
 the snapshot route validates loopback `Host`, `Origin` and `Sec-Fetch-Site`, then delegates to the
-Harness trust fence (`connection.requestRejection`) when present and fails closed if it throws —
-LAN access is opt-in via `DSH_BALANCE_POCKET_TRUSTED_HOSTS` only on Harnesses without that fence, and
+Harness trust fence (`connection.requestRejection`) when present and fails closed if it throws 鈥?LAN access is opt-in via `DSH_BALANCE_POCKET_TRUSTED_HOSTS` only on Harnesses without that fence, and
 doing so exposes the balance to anyone on that network; the plugin is read-only apart from its own
 ledger file; no third-party runtime dependencies; internal errors are never exposed verbatim;
 missing wallet fields are reported as unavailable rather than 0, an uncovered holiday year is labelled,
