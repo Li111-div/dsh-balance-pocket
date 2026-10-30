@@ -2,7 +2,7 @@
   "name": "dsh-balance-pocket-repo",
   "version": "0.1.0",
   "private": true,
-  "description": "DSH sidebar balance pocket plugin 鈥?repository root. The installable DSH package lives in plugin/.",
+  "description": "DSH sidebar balance pocket plugin — repository root. The installable DSH package lives in plugin/.",
   "license": "MIT",
   "author": "Li111-div",
   "repository": {

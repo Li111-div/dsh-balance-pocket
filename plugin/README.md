@@ -1,87 +1,118 @@
-# 浣欓灏忓彛琚?路 Balance Pocket
+# 余额小口袋 · Balance Pocket
 
-DeepSeek Harness锛圖SH锛塛eb/妗岄潰绔彃浠躲€傚乏渚ф爮搴曢儴锛堣缃寜閽梺锛夊涓€涓噾甯佸浘鏍?+
-褰撳墠浣欓锛堥珮宄版湡/浣庡嘲鏈熺敤灏忓渾鐐硅〃绀猴紝缁?浣庡嘲銆佹=楂樺嘲锛夛紝鐐逛竴涓?*鍚戜笂**寮瑰嚭涓€涓?璐寸潃渚ф爮瀹藉害鐨勫皬绐楋細
+DeepSeek Harness（DSH）Web/桌面端插件。左侧栏底部（设置按钮旁）多一个金币图标 +
+当前余额（高峰期/低峰期用小圆点表示，绿=低峰、橙=高峰），点一下**向上**弹出一个
+贴着侧栏宽度的小窗：
 
-- **DeepSeek 鍓╀綑浣欓**锛氬厖鍊?+ 璧犻噾锛屾寜鎺ュ彛杩斿洖鐨勫竵绉嶆樉绀猴紙楼 / $锛夛紱
-- **褰撳墠鏄珮宄版湡杩樻槸浣庡嘲鏈?*锛堝寳浜椂闂达級锛屼互鍙婅窛绂讳笅娆″垏鎹㈢殑鍊掕鏃讹紱
-- **浠婃棩宸茬敤**锛氭寜浣欓鍙樺寲瑙傛祴鍑虹殑鐪熷疄鎵ｈ垂锛涜娴嬩笉瀹屾暣鏃舵爣娉ㄣ€岃嚜 HH:mm 璧疯娴嬨€嶃€?
-涓嶆柊寤虹嫭绔嬮〉闈€佷笉鍗犱富闈㈡澘銆傚脊绐楁墦寮€鏃舵瘡 30 绉掑埛鏂颁竴娆★紝涔熷彲鎵嬪姩鍒锋柊锛?鍏抽棴寮圭獥鍚庡仠姝㈣疆璇笌鍊掕鏃讹紝渚ф爮鐘舵€佺偣鏀逛负 60 绉掍綆棰戝埛鏂般€傚瑙傦紙鑳屾櫙 / 鐗堝紡 / 鏄剧ず椤癸級鍦?**璁剧疆 鈫?浣欓灏忓彛琚?* 閲岃皟鏁达紝
-甯﹀疄鏃堕瑙堬紝鏀瑰姩绔嬪嵆鐢熸晥骞朵繚瀛樺湪褰撳墠娴忚鍣ㄣ€?
-> 浠撳簱銆侀棶棰樺弽棣堛€佽础鐚寚鍗楋細https://github.com/Li111-div/dsh-balance-pocket
+- **DeepSeek 剩余余额**：充值 + 赠金，按接口返回的币种显示（¥ / $）；
+- **当前是高峰期还是低峰期**（北京时间），以及距离下次切换的倒计时；
+- **今日已用**：按余额变化观测出的真实扣费；观测不完整时标注「自 HH:mm 起观测」。
 
-## 鍔熻兘
+不新建独立页面、不占主面板。弹窗打开时每 30 秒刷新一次，也可手动刷新；
+关闭弹窗后停止轮询与倒计时，侧栏状态点改为 60 秒低频刷新。外观（背景 / 版式 / 显示项）在 **设置 → 余额小口袋** 里调整，
+带实时预览，改动立即生效并保存在当前浏览器。
+
+> 仓库、问题反馈、贡献指南：https://github.com/Li111-div/dsh-balance-pocket
+
+## 功能
 
 | | |
 |---|---|
-| 渚ф爮鍏ュ彛 | 32脳32 閲戝竵鎸夐挳锛涘鏍忔椂鐩存帴鏄剧ず浣欓鍜屽嘲璋风姸鎬佺偣锛屼笉鎵撳紑寮圭獥涔熻兘鐪嬪埌 |
-| 鍚戜笂寮圭獥 | 璐寸潃渚ф爮鍚戜笂寮瑰嚭锛岀┖闂翠笉瓒宠嚜鍔ㄦ敼涓哄悜涓嬶紱鐐瑰閮?/ Esc / 绐楀彛澶辩劍鍏抽棴 |
-| 宄拌胺鏃舵 | 鍛ㄤ竴鑷冲懆浜?09:00鈥?2:00銆?4:00鈥?8:00 涓洪珮宄帮紱鍛ㄦ湯銆佹硶瀹氳妭鍋囨棩銆佸闂翠负浣庡嘲 |
-| 浠婃棩宸茬敤 | 褰撴棩寮€鐩樹綑棰?鈭?褰撳墠浣欓锛涘厖鍊艰嚜鍔ㄥ钩绉伙紝涓嶄細鍙樻垚璐熸暟锛涜法鏃ヨ嚜鍔ㄩ噸缃?|
-| 澶栬璁剧疆 | 璺熼殢涓婚 / 绾壊 / 鍗婇€忔槑 / 纾ㄧ爞 / 閫忔槑 / 浜氬厠鍔涳紱鏍囧噯 / 绱у噾 / 鏋佺畝涓夌鐗堝紡锛涙潵婧愩€佽娴嬭捣鐐广€佺鏁板彲鍒嗗埆寮€鍏?|
-| 涓嫳鍙岃 | 璺熼殢 DSH 鐣岄潰璇█瀹炴椂鍒囨崲锛屾棤闇€閲嶅惎 |
-| 鏃犳瀯寤?| 瀹㈡埛绔槸鎵嬪啓 React锛坄React.createElement`锛夛紝瑁呭ソ鍗崇敤锛屾病鏈夋墦鍖呮楠?|
+| 侧栏入口 | 32×32 金币按钮；宽栏时直接显示余额和峰谷状态点，不打开弹窗也能看到 |
+| 向上弹窗 | 贴着侧栏向上弹出，空间不足自动改为向下；点外部 / Esc / 窗口失焦关闭 |
+| 峰谷时段 | 周一至周五 09:00–12:00、14:00–18:00 为高峰；周末、法定节假日、夜间为低峰 |
+| 今日已用 | 当日开盘余额 − 当前余额；充值自动平移，不会变成负数；跨日自动重置 |
+| 外观设置 | 跟随主题 / 纯色 / 半透明 / 磨砂 / 透明 / 亚克力；标准 / 紧凑 / 极简三种版式；来源、观测起点、秒数可分别开关 |
+| 中英双语 | 跟随 DSH 界面语言实时切换，无需重启 |
+| 无构建 | 客户端是手写 React（`React.createElement`），装好即用，没有打包步骤 |
 
-## 瀹夎
+## 安装
 
-瑕佹眰锛欴SH 妗岄潰绔紝骞朵笖宸茬粡鐧诲綍 DeepSeek 璐﹀彿鎴栭厤缃簡 `DEEPSEEK_API_KEY`銆?
-1. 鎶婃湰浠撳簱鐨?`plugin/` 鐩綍瀹夎涓?DSH 鏈湴鎻掍欢锛堟彃浠剁鐞嗗櫒閫夋嫨鏈湴鐩綍锛屾垨鍐欒繘 profile 渚濊禆锛夛紱
-2. 閲嶈浇鐣岄潰锛屼晶鏍忓簳閮ㄥ嚭鐜伴噾甯佸浘鏍囥€?
-profile 渚濊禆绀轰緥锛?
+要求：DSH 桌面端，并且已经登录 DeepSeek 账号或配置了 `DEEPSEEK_API_KEY`。
+
+1. 把本仓库的 `plugin/` 目录安装为 DSH 本地插件（插件管理器选择本地目录，或写进 profile 依赖）；
+2. 重载界面，侧栏底部出现金币图标。
+
+profile 依赖示例：
+
 ```json
 "dsh-balance-pocket": "link:D:/path/to/dsh-balance-pocket/plugin"
 ```
 
-GitHub Release 涔嬪悗涔熷彲浠ョ洿鎺ヨ tarball锛?
+GitHub Release 之后也可以直接装 tarball：
+
 ```json
 "dsh-balance-pocket": "https://github.com/Li111-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
 ```
 
-鏈彃浠舵病鏈夎繍琛屾椂渚濊禆锛屼篃涓嶉渶瑕?`npm install` 鎴栨瀯寤恒€?
-## 鏁版嵁浠庡摢鏉?
-| 鏁版嵁 | 鏉ユ簮 |
+本插件没有运行时依赖，也不需要 `npm install` 或构建。
+
+## 数据从哪来
+
+| 数据 | 来源 |
 |---|---|
-| 浣欓 | 鈶?宸查厤缃殑 `DEEPSEEK_API_KEY` 鈫?`https://api.deepseek.com/user/balance`锛涒憽 鏈厤缃垨澶辫触 鈫?DSH 宸茬櫥褰曠殑 DeepSeek 璐﹀彿锛坄deepseekAccount.getBalance`锛屽厖鍊奸挶鍖?+ 璧犻噾閽卞寘鎸夊竵绉嶇浉鍔狅級 |
-| 宄?璋?| 鍖椾含鏃堕棿锛氬懆涓€鑷冲懆浜旓紙涓嶅惈涓浗娉曞畾鑺傚亣鏃ワ級09:00鈥?2:00銆?4:00鈥?8:00 涓洪珮宄帮紱鍏朵綑鏃舵涓轰綆宄般€備綆宄颁环 = 楂樺嘲浠?脳 50% |
-| 浠婃棩宸茬敤 | Host 绔寜浣欓瑙傛祴璁拌处锛氬綋鏃ョ涓€娆¤娴?= 寮€鐩樹綑棰濓紝涔嬪悗姣忔瑙傛祴鏇存柊锛沗浠婃棩宸茬敤 = 寮€鐩?鈭?褰撳墠`銆傝法鏃ラ噸缃紝涓嶅悓鏉ユ簮/甯佺鍒嗚处鏈?|
+| 余额 | ① 已配置的 `DEEPSEEK_API_KEY` → `https://api.deepseek.com/user/balance`；② 未配置或失败 → DSH 已登录的 DeepSeek 账号（`deepseekAccount.getBalance`，充值钱包 + 赠金钱包按币种相加） |
+| 峰/谷 | 北京时间：周一至周五（不含中国法定节假日）09:00–12:00、14:00–18:00 为高峰；其余时段为低峰。低峰价 = 高峰价 × 50% |
+| 今日已用 | Host 端按余额观测记账：当日第一次观测 = 开盘余额，之后每次观测更新；`今日已用 = 开盘 − 当前`。跨日重置，不同来源/币种分账本 |
 
-浣欓蹇収璧版湰鏈哄彧璇昏矾鐢?`GET /dsh-balance-pocket/snapshot`锛氬厛鏍￠獙鍥炵幆 Host銆乣Origin` 涓?`Sec-Fetch-Site`锛屽啀濮旀墭 DSH 鐨勪俊浠绘爡鏍忥紙`connection.requestRejection`锛屾爡鏍忔姏閿欐寜鎷掔粷澶勭悊锛夈€?鑰佺増鏈?DSH 娌℃湁鏍呮爮鏃讹紝鍙€氳繃鐜鍙橀噺
-`DSH_BALANCE_POCKET_TRUSTED_HOSTS=myhost.lan:8313`锛堥€楀彿鍒嗛殧锛夋樉寮忔斁琛?鈥斺€?鏀捐鍚庡悓缃戞浠讳綍鑳借闂鍦板潃鐨勮澶囬兘鑳借鍒颁綑棰濄€?
-璐︽湰钀藉湪 `$DSH_HOME/dsh-balance-pocket/ledger.json`锛屼笉鍚屼綑棰濇潵婧愶紙API Key / 璐﹀彿锛?涓庝笉鍚屽竵绉嶅悇璁颁竴鏈紝浜掍笉娣风畻锛涜秴杩?120 澶╃殑璁板綍鑷姩娓呯悊銆?
-## 闅愮
+余额快照走本机只读路由 `GET /dsh-balance-pocket/snapshot`：先校验回环 Host、`Origin` 与
+`Sec-Fetch-Site`，再委托 DSH 的信任栅栏（`connection.requestRejection`，栅栏抛错按拒绝处理）。
+老版本 DSH 没有栅栏时，可通过环境变量
+`DSH_BALANCE_POCKET_TRUSTED_HOSTS=myhost.lan:8313`（逗号分隔）显式放行 ——
+放行后同网段任何能访问该地址的设备都能读到余额。
 
-- API Key / 璐﹀彿 token 鍙敤浜庤姹?DeepSeek 瀹樻柟鎺ュ彛锛屼笉浼氬嚭鐜板湪鍝嶅簲銆佹棩蹇椼€侀敊璇枃妗堟垨 DOM 涓€?- 蹇収璺敱鍙湇鍔℃湰鏈猴紝骞舵牎楠?`Origin` / `Sec-Fetch-Site`銆?- 璐︽湰鍙繚瀛樹綑棰濇暟鍊笺€佸竵绉嶄笌鏉ユ簮鏍囪瘑锛屼笉鍚换浣曞嚟鎹€?- 澶栬鍋忓ソ鍙啓娴忚鍣?`localStorage`銆?
-## 涓轰粈涔堛€屼粖鏃ュ凡鐢ㄣ€嶆湁鏃舵樉绀?0 鎴栥€岃嚜 HH:mm 璧疯娴嬨€?
-浣欓鎺ュ彛鏄挶鍖呭揩鐓с€佷笉鏄祦姘达紝鎵€浠ユ彃浠跺彧鑳借娴嬨€屽畠杩愯鏈熼棿銆嶇殑浣欓鍙樺寲銆?濡傛灉褰撳ぉ鎻掍欢鏄湪涓崍鎵嶇涓€娆¤娴嬪埌浣欓锛屼箣鍓嶅凡缁忎骇鐢熺殑娑堣垂鏃犳硶杩藉洖 鈥斺€?杩欐椂浼氭樉绀?`partial`锛岀晫闈㈠啓銆岃嚜 HH:mm 璧疯娴嬨€嶏紝涓嶄細鍋囪閭ｆ槸鍏ㄥぉ鏁版嵁銆?Host 姣?5 鍒嗛挓鍋氫竴娆″悗鍙拌娴嬶紝鎻掍欢甯搁┗鏃朵竴澶╃殑鏁板瓧鏄繛缁殑銆?
-## 缁存姢鐐?
-- 鑺傚亣鏃ヨ〃鍦?`holidays.js`锛堟寜骞翠唤锛夈€傛瘡骞?11 鏈堝浗鍔￠櫌鍏竷娆″勾鏀惧亣瀹夋帓鍚庤ˉ涓嬩竴骞达細
-  鍙垪**鏀惧亣涓嶄笂鐝?*鐨勬棩鏈燂紝璋冧紤涓婄彮鐨勫懆鏈笉鐢ㄥ垪锛堝懆鏈鍒欏ぉ鐒舵寜浣庡嘲璁¤垂锛夈€?  琛ㄩ噷娌℃湁鐨勫勾浠斤紝寮圭獥浼氭彁绀恒€岃妭鍋囨棩琛ㄦ湭瑕嗙洊 YYYY 骞淬€嶏紝涓嶄細榛橀粯鎶婂亣鏈熷綋宸ヤ綔鏃ャ€?- 楂樺嘲鏈熼挓鐐硅嫢瀹樻柟璋冩暣锛屾敼 `peak.js` 鐨?`PEAK_RANGES`銆?- 浠锋牸鍊嶆暟锛堜綆宄?= 楂樺嘲 脳 0.5锛夌洰鍓嶅彧浣滀负 `peakMultiplier` 鎻愮ず锛屼笉鍙備笌璁¤垂銆?
-## 寮€鍙戜笌鑷
+账本落在 `$DSH_HOME/dsh-balance-pocket/ledger.json`，不同余额来源（API Key / 账号）
+与不同币种各记一本，互不混算；超过 120 天的记录自动清理。
+
+## 隐私
+
+- API Key / 账号 token 只用于请求 DeepSeek 官方接口，不会出现在响应、日志、错误文案或 DOM 中。
+- 快照路由只服务本机，并校验 `Origin` / `Sec-Fetch-Site`。
+- 账本只保存余额数值、币种与来源标识，不含任何凭据。
+- 外观偏好只写浏览器 `localStorage`。
+
+## 为什么「今日已用」有时显示 0 或「自 HH:mm 起观测」
+
+余额接口是钱包快照、不是流水，所以插件只能观测「它运行期间」的余额变化。
+如果当天插件是在中午才第一次观测到余额，之前已经产生的消费无法追回 —— 这时会显示
+`partial`，界面写「自 HH:mm 起观测」，不会假装那是全天数据。
+Host 每 5 分钟做一次后台观测，插件常驻时一天的数字是连续的。
+
+## 维护点
+
+- 节假日表在 `holidays.js`（按年份）。每年 11 月国务院公布次年放假安排后补下一年：
+  只列**放假不上班**的日期，调休上班的周末不用列（周末规则天然按低峰计费）。
+  表里没有的年份，弹窗会提示「节假日表未覆盖 YYYY 年」，不会默默把假期当工作日。
+- 高峰期钟点若官方调整，改 `peak.js` 的 `PEAK_RANGES`。
+- 价格倍数（低峰 = 高峰 × 0.5）目前只作为 `peakMultiplier` 提示，不参与计费。
+
+## 开发与自检
 
 ```bash
-node check.mjs   # 72 椤癸細宄拌胺杈圭晫銆佽妭鍋囨棩琛ㄨ鐩栥€佽处鏈鍒欍€佽矾鐢变笌淇′换鏍呮爮銆佸鎴风娓叉煋
+node check.mjs   # 72 项：峰谷边界、节假日表覆盖、账本规则、路由与信任栅栏、客户端渲染
 ```
 
-## 鏂囦欢
+## 文件
 
-| 鏂囦欢 | 浣滅敤 |
+| 文件 | 作用 |
 |---|---|
-| `index.js` | Host锛氬揩鐓ц矾鐢便€佷綑棰濊В鏋愶紙API Key / 璐﹀彿锛夈€佺紦瀛樹笌鍚庡彴瑙傛祴 |
-| `peak.js` | 宄拌胺鏃舵鍒ゅ畾锛堢函鍑芥暟锛屽彲鐙珛娴嬭瘯锛?|
-| `holidays.js` | 涓浗娉曞畾鑺傚亣鏃ヨ〃锛堟寜骞翠唤锛岀函鏁版嵁锛?|
-| `ledger.js` | 浣欓瑙傛祴璐︽湰锛堝綋鏃ュ凡鐢ㄣ€乸artial銆佸厖鍊煎钩绉汇€佸垎璐︽湰锛?|
-| `client.js` | Client锛氫晶鏍忓簳閮ㄥ叆鍙?+ 鍚戜笂寮圭獥 + 澶栬璁剧疆椤碉紙鎵嬪啓 React锛屾棤鏋勫缓锛?|
-| `locale/*.json` | 鎻掍欢绠＄悊鍣ㄩ噷鐨勬爣棰?鎻忚堪锛堜腑鑻憋級 |
-| `cordis.patch.yml` | bundle patch锛氭彃鍏?Host 鍗婁釜鎻掍欢锛堝惈閲嶅鎸傝浇瀹堝崼锛?|
-| `icon.svg` | 鎻掍欢鍥炬爣 |
+| `index.js` | Host：快照路由、余额解析（API Key / 账号）、缓存与后台观测 |
+| `peak.js` | 峰谷时段判定（纯函数，可独立测试） |
+| `holidays.js` | 中国法定节假日表（按年份，纯数据） |
+| `ledger.js` | 余额观测账本（当日已用、partial、充值平移、分账本） |
+| `client.js` | Client：侧栏底部入口 + 向上弹窗 + 外观设置页（手写 React，无构建） |
+| `locale/*.json` | 插件管理器里的标题/描述（中英） |
+| `cordis.patch.yml` | bundle patch：插入 Host 半个插件（含重复挂载守卫） |
+| `icon.svg` | 插件图标 |
 
-鏋舵瀯涓庢暟鎹绾﹁浠撳簱鐨?[docs/DESIGN.md](https://github.com/Li111-div/dsh-balance-pocket/blob/main/docs/DESIGN.md)銆?
+架构与数据契约见仓库的 [docs/DESIGN.md](https://github.com/Li111-div/dsh-balance-pocket/blob/main/docs/DESIGN.md)。
+
 ## English
 
 A DSH Web/desktop plugin: a coin entry at the sidebar foot opens an upward popover with the live
 DeepSeek balance (top-up + bonus), the current peak/off-peak pricing period (Beijing time) with a
 countdown, and today's spend derived from balance observations. Appearance (six backgrounds, three
-layouts, display toggles) is configurable under Settings 鈫?Balance Pocket with a live preview.
+layouts, display toggles) is configurable under Settings → Balance Pocket with a live preview.
 
 Install the `plugin/` directory as a local DSH plugin, or add
 `"dsh-balance-pocket": "link:/path/to/plugin"` to your profile dependencies. No runtime dependencies,
@@ -92,4 +123,4 @@ Run `node check.mjs` for the self-check. Licensed under MIT.
 
 ## License
 
-MIT 漏 2026 Li111-div 鈥?see [LICENSE](LICENSE).
+MIT © 2026 Li111-div — see [LICENSE](LICENSE).
