@@ -1,0 +1,67 @@
+name: Bug report
+description: 报告一个可以复现的问题 / Report a reproducible problem
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！提交前请先搜索是否已有相同 Issue。
+        **请勿粘贴真实的 `DEEPSEEK_API_KEY`、账号 token 或完整 `ledger.json`**，密码类内容请打码。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 现象 / What happened
+      description: 实际看到了什么？期望是什么？
+      placeholder: |
+        实际：……
+        期望：……
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      placeholder: |
+        1. 点击侧栏金币图标
+        2. 打开 设置 → 余额小口袋
+        3. ……
+    validations:
+      required: true
+  - type: input
+    id: dsh-version
+    attributes:
+      label: DSH 版本 / DSH version
+      description: 设置页里显示的版本号，或安装包版本
+      placeholder: "例如 0.1.0 / DSH 2026.10"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: 操作系统 / OS
+      placeholder: "例如 Windows 11 23H2 / macOS 15 / Ubuntu 24.04"
+    validations:
+      required: true
+  - type: dropdown
+    id: balance-source
+    attributes:
+      label: 余额来源 / Balance source
+      options:
+        - 账号登录 / Account login
+        - DEEPSEEK_API_KEY
+        - 两者都失败 / Both failed
+        - 不确定 / Not sure
+  - type: textarea
+    id: logs
+    attributes:
+      label: 错误信息 / Relevant logs
+      description: 脱敏后的控制台或网络错误；请移除 key、token、完整余额等敏感信息
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 确认 / Checklist
+      options:
+        - label: 我使用的是最新版本，并且没有在 Issue 里暴露任何凭据
+          required: true

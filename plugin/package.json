@@ -1,0 +1,61 @@
+{
+  "name": "dsh-balance-pocket",
+  "version": "0.1.0",
+  "description": "DSH 侧栏底部余额入口：向上弹出小窗，实时显示 DeepSeek 余额、峰谷时段与今日已用。DSH sidebar balance pocket with a live upward popover for the DeepSeek balance, peak/off-peak pricing and today's spend.",
+  "type": "module",
+  "license": "MIT",
+  "author": "LMC111-div",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek",
+    "deepseek-harness",
+    "balance",
+    "sidebar",
+    "popover",
+    "peak-hours"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LMC111-div/dsh-balance-pocket.git",
+    "directory": "plugin"
+  },
+  "homepage": "https://github.com/LMC111-div/dsh-balance-pocket#readme",
+  "bugs": {
+    "url": "https://github.com/LMC111-div/dsh-balance-pocket/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "peak.js",
+    "ledger.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  }
+}

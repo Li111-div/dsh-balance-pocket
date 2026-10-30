@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build / pack output
+dist/
+coverage/
+*.tgz
+
+# Logs and local environment
+*.log
+.env
+.env.*
+!.env.example
+
+# DSH local state (ledger lives under $DSH_HOME, this is just a safety net)
+.dsh-balance-pocket/
+ledger.json
+
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# Local test leftovers
+probe.txt
+acl-recovery-*/
+acl-backup-*.json

@@ -1,0 +1,22 @@
+{
+  "name": "dsh-balance-pocket-repo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH sidebar balance pocket plugin — repository root. The installable DSH package lives in plugin/.",
+  "license": "MIT",
+  "author": "LMC111-div",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LMC111-div/dsh-balance-pocket.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LMC111-div/dsh-balance-pocket/issues"
+  },
+  "homepage": "https://github.com/LMC111-div/dsh-balance-pocket#readme",
+  "scripts": {
+    "test": "node check.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

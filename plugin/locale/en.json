@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Balance Pocket",
+    "description": "An entry at the sidebar foot that opens a small upward popover with the live DeepSeek balance, the current peak/off-peak pricing period, and today's spend."
+  }
+}

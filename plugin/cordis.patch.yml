@@ -1,0 +1,7 @@
+# dsh-balance-pocket — bundle patch
+# Inserts the Host half (snapshot route + peak schedule + today ledger).
+# The Client half rides the same package through the `dsh.client` manifest.
+
+- insert:
+    - id: dsh-balance-pocket
+      name: dsh-balance-pocket
