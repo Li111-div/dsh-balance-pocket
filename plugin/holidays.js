@@ -18,18 +18,10 @@
 
 /** @type {Record<number, string[]>} year → YYYY-MM-DD days off. */
 export const HOLIDAYS = {
-  // 国办发明电〔2024〕7 号
-  2025: [
-    '2025-01-01',
-    '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31',
-    '2025-02-01', '2025-02-02', '2025-02-03', '2025-02-04',
-    '2025-04-04', '2025-04-05', '2025-04-06',
-    '2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05',
-    '2025-05-31', '2025-06-01', '2025-06-02',
-    '2025-10-01', '2025-10-02', '2025-10-03', '2025-10-04',
-    '2025-10-05', '2025-10-06', '2025-10-07', '2025-10-08',
-  ],
-  // 国办发明电〔2025〕7 号
+  // 国办发明电〔2025〕7 号 — the arrangement for the year this release targets.
+  // Only the current year is kept on purpose: past years are never consulted
+  // (the schedule is evaluated for "now"), and shipping an entry nobody has
+  // re-checked against the notice is worse than shipping none.
   2026: [
     '2026-01-01', '2026-01-02', '2026-01-03',
     '2026-02-15', '2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19',

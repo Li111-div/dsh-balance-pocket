@@ -63,7 +63,7 @@ plugin/
     "peakMultiplier": 2,                 // 仅提示，不参与计费
     "holidayCovered": true,              // false = 该年份不在节假日表里
     "holidayYear": 2026,
-    "holidayYears": [2025, 2026]
+    "holidayYears": [2026]
   },
   "today": {
     "day": "2026-10-30",                 // 北京时间日历日
@@ -103,7 +103,7 @@ plugin/
   时段起点 / 下次切换点（`periodStartAtMs` / `nextChangeAtMs`）。
   这样节假日、周末与工作日交界处也能得到正确结果。
 - 节假日表在 `holidays.js`，按年份分组，只列**放假不上班**的日期；调休上班的周末不列
-  （周末规则天然按低峰计费）。当前覆盖 2025–2026。
+  （周末规则天然按低峰计费）。当前覆盖 2026。
 - **未覆盖年份必须显式降级**：`peakState()` 返回 `holidayCovered: false` 与 `holidayYear`，
   快照透传，弹窗显示「节假日表未覆盖 YYYY 年」，`check.mjs` 断言这一点。
   宁可承认不知道，也不要把假期当工作日（那会让峰谷徽标与实际计费相反）。

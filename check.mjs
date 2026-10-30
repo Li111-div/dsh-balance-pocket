@@ -136,10 +136,11 @@ check('beijingDay crosses UTC day boundary', () => {
 // "no holidays" — that would show "off-peak" during a holiday at peak price.
 const holidays = await import(pathToFileURL(path.join(pluginDir, 'holidays.js')).href)
 check('holiday table years are sorted and parseable', () => {
-  assert.ok(holidays.HOLIDAY_YEARS.length >= 2)
+  assert.ok(holidays.HOLIDAY_YEARS.length >= 1, 'the calendar must cover at least the current year')
   const sorted = holidays.HOLIDAY_YEARS.slice().sort((a, b) => a - b)
   assert.deepEqual(holidays.HOLIDAY_YEARS, sorted)
   for (const year of holidays.HOLIDAY_YEARS) {
+    assert.ok(holidays.HOLIDAYS[year].length > 0, 'year ' + year + ' has no entries')
     for (const day of holidays.HOLIDAYS[year]) {
       assert.match(day, /^\d{4}-\d{2}-\d{2}$/)
       assert.equal(Number(day.slice(0, 4)), year, 'entry ' + day + ' is filed under ' + year)

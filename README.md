@@ -104,7 +104,7 @@ git clone https://github.com/LMC111-div/dsh-balance-pocket.git
 ### 已知限制
 
 - **「今日已用」只能观测插件运行期间的变化**。如果当天插件是中午才第一次取到余额，之前的消费无法追回，界面会写「自 HH:mm 起观测」，不会假装是全天数据。
-- **法定节假日表当前覆盖 2025–2026 年**（`plugin/holidays.js`，依据国务院放假安排）。国务院每年 11 月公布次年安排；
+- **法定节假日表当前覆盖 2026 年**（`plugin/holidays.js`，依据国务院 2026 年放假安排）。国务院每年 11 月公布次年安排；
   表里没有的年份，插件会在弹窗里明确提示「节假日表未覆盖 YYYY 年」，而不是默默把假期当工作日。
 - 网络抖动时会短暂复用上一次成功读数（最多 10 分钟），此时弹窗会标注「数据延迟 N 秒」，不会当成实时值。
 - 余额接口是钱包快照，不等于账单；「今日已用」是观测值，存在最多 5 分钟的采样延迟。
@@ -193,7 +193,7 @@ Each release also ships `SHA256SUMS.txt` for verification.
 
 - **Today's spend can only cover the time the plugin was observing.** A late first reading of the day is
   labelled "observed since …", never presented as a full-day figure.
-- **The statutory-holiday calendar covers 2025–2026** (`plugin/holidays.js`). For a year it does not cover,
+- **The statutory-holiday calendar covers 2026** (`plugin/holidays.js`). For a year it does not cover,
   the popover says so explicitly instead of silently treating holidays as workdays.
 - A cached reading reused after a failed refresh (up to 10 minutes) is labelled with its age.
 - The balance API is a wallet snapshot, not a ledger, so today's spend lags by up to the 5-minute sampling
