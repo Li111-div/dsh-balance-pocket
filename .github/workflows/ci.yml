@@ -44,9 +44,9 @@ jobs:
 
       - name: Check that the packed tarball contains the plugin
         run: |
-          cd plugin
-          npm pack --pack-destination ../dist
-          cd ..
+          # `npm pack --pack-destination` does not create the directory itself.
+          mkdir -p dist
+          (cd plugin && npm pack --pack-destination ../dist)
           tar -tzf dist/*.tgz > files.txt
           for required in package/package.json package/index.js package/client.js package/peak.js \
                           package/ledger.js package/holidays.js package/cordis.patch.yml \
