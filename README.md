@@ -68,7 +68,8 @@
 "dsh-balance-pocket": "https://github.com/Li111-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
 ```
 
-发布页同时提供 `SHA256SUMS.txt` 供校验。
+发布页同时提供 `SHA256SUMS.txt` 供校验：把 `.tgz` 和它下到同一个目录，运行
+`sha256sum -c SHA256SUMS.txt`（Windows 用 `certutil -hashfile <文件> SHA256` 对比）。
 
 **方式 C：开发模式**
 
@@ -177,7 +178,8 @@ or, after a GitHub release, use the packaged tarball:
 "dsh-balance-pocket": "https://github.com/Li111-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
 ```
 
-Each release also ships `SHA256SUMS.txt` for verification.
+Each release also ships `SHA256SUMS.txt`: download it next to the `.tgz` and run
+`sha256sum -c SHA256SUMS.txt` to verify.
 
 ### Privacy
 

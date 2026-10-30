@@ -41,10 +41,10 @@ jobs:
       - name: Pack the DSH plugin
         run: |
           mkdir -p dist
-          cd plugin
-          npm pack --pack-destination ../dist
-          cd ..
-          sha256sum dist/*.tgz > dist/SHA256SUMS.txt
+          (cd plugin && npm pack --pack-destination ../dist)
+          # Record bare filenames so `sha256sum -c` works from the download
+          # directory, without the build-time dist/ prefix.
+          (cd dist && sha256sum *.tgz > SHA256SUMS.txt)
 
       - name: Create GitHub Release
         env:
