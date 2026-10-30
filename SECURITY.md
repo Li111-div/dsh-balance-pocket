@@ -24,13 +24,18 @@
 
 1. **凭据不出 Host 端**：`DEEPSEEK_API_KEY` / 账号 token 只用于向 DeepSeek 官方接口发请求，
    不得出现在快照响应、日志、错误文案、DOM 或账本文件中。
-2. **快照路由只服务本机**：`GET /dsh-balance-pocket/snapshot` 校验 `Host` 必须是回环地址
-   （`localhost` / `127.0.0.0/8` / `::1`），并校验 `Origin` 与 `Sec-Fetch-Site`，拒绝跨站请求。
-   通过局域网/反向代理访问属于显式选择加入，需要设置 `DSH_BALANCE_POCKET_TRUSTED_HOSTS`。
+2. **快照路由两层信任**：先校验 `Host` 必须为回环地址（`localhost` / `127.0.0.0/8` / `::1`）、
+   `Sec-Fetch-Site` 不得为 `cross-site`、带 `Origin` 时必须与 `Host` 同源；随后在 Harness 提供
+   `connection.requestRejection` 时**委托**宿主栅栏（它知道 `--trusted-host` 与反向代理），
+   栅栏抛异常一律按拒绝处理（fail-closed）。仅在没有栅栏的老 Harness 上，
+   才回落到 `DSH_BALANCE_POCKET_TRUSTED_HOSTS` 显式放行列表 ——
+   **放行后同网段任何能访问该地址的设备都能读取余额**，属于用户显式选择加入的风险。
 3. **只读**：插件不写 profile、不改其他插件数据；唯一的落盘是 `$DSH_HOME/dsh-balance-pocket/ledger.json`，
    内容只有日期、余额数值、币种和来源标识。
 4. **最小依赖**：Host 与 Client 都不引入第三方运行时依赖，客户端无构建、无远程脚本。
 5. **错误不泄露内部信息**：路由任何内部失败都返回 200 + 通用错误文案，不返回堆栈、路径或凭据。
+6. **不假装知道**：钱包字段缺失时判为「不可用」而不是 `0`；节假日表未覆盖的年份会在界面明确提示，
+   复用过期读数会标注延迟时间 —— 宁可显示「不知道」，也不给用户一个看起来确定但错误的值。
 
 ## 不在范围内
 
@@ -45,6 +50,10 @@ Report vulnerabilities privately via GitHub Security Advisories
 Do not include real API keys or tokens. Supported versions: 0.1.x.
 
 Security contract: credentials never leave the Host process and never appear in responses/logs/DOM;
-the snapshot route is loopback-only with Origin and Sec-Fetch-Site checks (LAN access is opt-in via
-`DSH_BALANCE_POCKET_TRUSTED_HOSTS`); the plugin is read-only apart from its own ledger file; no
-third-party runtime dependencies; internal errors are never exposed verbatim.
+the snapshot route validates loopback `Host`, `Origin` and `Sec-Fetch-Site`, then delegates to the
+Harness trust fence (`connection.requestRejection`) when present and fails closed if it throws —
+LAN access is opt-in via `DSH_BALANCE_POCKET_TRUSTED_HOSTS` only on Harnesses without that fence, and
+doing so exposes the balance to anyone on that network; the plugin is read-only apart from its own
+ledger file; no third-party runtime dependencies; internal errors are never exposed verbatim;
+missing wallet fields are reported as unavailable rather than 0, an uncovered holiday year is labelled,
+and a reused stale reading shows its age.

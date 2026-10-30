@@ -24,6 +24,20 @@ jobs:
       - name: Run self-check before releasing
         run: node check.mjs
 
+      - name: Verify the tag matches the package version
+        run: |
+          pkg_version="$(node -p "require('./plugin/package.json').version")"
+          root_version="$(node -p "require('./package.json').version")"
+          source_version="$(node -p "require('node:fs').readFileSync('./plugin/index.js','utf8').match(/const VERSION = '([^']+)'/)[1]")"
+          if [ "$pkg_version" != "$root_version" ] || [ "$pkg_version" != "$source_version" ]; then
+            echo "Version mismatch: plugin=$pkg_version root=$root_version index.js=$source_version" >&2
+            exit 1
+          fi
+          if [ "v$pkg_version" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version v$pkg_version" >&2
+            exit 1
+          fi
+
       - name: Pack the DSH plugin
         run: |
           mkdir -p dist

@@ -32,3 +32,24 @@ jobs:
 
       - name: Run self-check
         run: node check.mjs
+
+      - name: Verify the versions agree
+        run: |
+          pkg_version="$(node -p "require('./plugin/package.json').version")"
+          root_version="$(node -p "require('./package.json').version")"
+          source_version="$(node -p "require('node:fs').readFileSync('./plugin/index.js','utf8').match(/const VERSION = '([^']+)'/)[1]")"
+          echo "plugin=$pkg_version root=$root_version index.js=$source_version"
+          test "$pkg_version" = "$root_version"
+          test "$pkg_version" = "$source_version"
+
+      - name: Check that the packed tarball contains the plugin
+        run: |
+          cd plugin
+          npm pack --pack-destination ../dist
+          cd ..
+          tar -tzf dist/*.tgz > files.txt
+          for required in package/package.json package/index.js package/client.js package/peak.js \
+                          package/ledger.js package/holidays.js package/cordis.patch.yml \
+                          package/locale/zh.json package/README.md package/LICENSE; do
+            grep -qx "$required" files.txt || { echo "missing $required in the tarball" >&2; exit 1; }
+          done

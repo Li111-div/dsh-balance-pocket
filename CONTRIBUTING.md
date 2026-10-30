@@ -22,7 +22,7 @@ English summary at the bottom.
 - 编辑器建议开启 EditorConfig；仓库已提供 `.editorconfig`。
 
 ```bash
-node check.mjs   # 全部 56 项通过后再提交 PR
+node check.mjs   # 全部 72 项通过后再提交 PR
 ```
 
 ## 代码约定
@@ -61,12 +61,14 @@ node check.mjs   # 全部 56 项通过后再提交 PR
 
 ## 维护节假日表
 
-`plugin/peak.js` 里的 `HOLIDAYS_2026` 依据国务院每年 11 月发布的次年放假安排维护。
+节假日表在 `plugin/holidays.js`（按年份分组，纯数据）。国务院每年 11 月发布次年放假安排，
 新增年份时：
 
 1. 只列**放假不上班**的日期；调休上班的周末不要列（周末规则已经覆盖）。
 2. 在 `check.mjs` 里补该年份的边界断言（至少：假期第一天、最后一天、节后首个工作日 09:00）。
+   表结构与「每个假期都不判高峰」已有通用断言，新增年份会自动被它们检查。
 3. 同步更新 README 的「已知限制」和 CHANGELOG。
+4. 未收录年份不需要特殊处理：`peakState()` 会返回 `holidayCovered: false`，界面自动提示。
 
 ## 发布流程（维护者）
 

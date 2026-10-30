@@ -26,7 +26,9 @@ const BALANCE_URL = 'https://api.deepseek.com/user/balance'
 const FETCH_TIMEOUT_MS = 8000
 const ACCOUNT_TIMEOUT_MS = 6000
 const BALANCE_TTL_MS = 20000
+const FAILURE_TTL_MS = 5000
 const STALE_GRACE_MS = 10 * 60 * 1000
+const CREDENTIAL_RETRY_MS = 700
 const BACKGROUND_OBSERVE_MS = 5 * 60 * 1000
 
 /**
@@ -41,6 +43,10 @@ const TRUSTED_AUTHORITIES = String(process.env.DSH_BALANCE_POCKET_TRUSTED_HOSTS 
   .filter(Boolean)
 
 export const inject = ['webServer']
+
+// Exported for check.mjs only: the wallet-selection rules are pure functions and
+// the one place where a missing field could be misread as "balance is zero".
+export { pickDeepSeekWallet, pickAccountWallets }
 
 function messageOf(error) {
   if (!error) return '未知错误'
@@ -61,9 +67,22 @@ function round6(value) {
   return Number.isFinite(number) ? Math.round(number * 1e6) / 1e6 : null
 }
 
+/**
+ * Parse an amount that the upstream API may send as a number or a numeric
+ * string. `null`, `''` and anything unparsable return `null` — a MISSING field
+ * must never be read as "0", or the UI would show a confident ¥0.00 for a
+ * wallet it never received.
+ */
+function toAmount(value) {
+  if (value === null || value === undefined || value === '') return null
+  if (typeof value !== 'number' && typeof value !== 'string') return null
+  const number = Number(value)
+  return Number.isFinite(number) ? number : null
+}
+
 function pickDeepSeekWallet(data) {
   const infos = Array.isArray(data && data.balance_infos) ? data.balance_infos : []
-  const usable = infos.filter((info) => info && Number.isFinite(Number(info.total_balance)))
+  const usable = infos.filter((info) => info && toAmount(info.total_balance) !== null)
   if (usable.length === 0) return null
   const isCny = (info) => String((info && info.currency) || '').toUpperCase() === 'CNY'
   const nonZero = usable.filter((info) => Number(info.total_balance) > 0)
@@ -71,8 +90,8 @@ function pickDeepSeekWallet(data) {
 }
 
 function pickAccountWallets(value, bonusWallets) {
-  const normal = (Array.isArray(value) ? value : []).filter((wallet) => wallet && Number.isFinite(Number(wallet.balance)))
-  const bonus = (Array.isArray(bonusWallets) ? bonusWallets : []).filter((wallet) => wallet && Number.isFinite(Number(wallet.balance)))
+  const normal = (Array.isArray(value) ? value : []).filter((wallet) => wallet && toAmount(wallet.balance) !== null)
+  const bonus = (Array.isArray(bonusWallets) ? bonusWallets : []).filter((wallet) => wallet && toAmount(wallet.balance) !== null)
   const all = normal.concat(bonus)
   if (all.length === 0) return null
   const currencyOf = (wallet) => String((wallet && wallet.currency) || 'CNY').toUpperCase()
@@ -104,14 +123,22 @@ function isLoopbackHostname(hostname) {
   return [match[2], match[3], match[4]].every((part) => Number(part) <= 255)
 }
 
-/** The snapshot is local-only: a loopback (or explicitly trusted) Host and a same-origin/none Origin. */
-function isTrustedRequest(req) {
+/**
+ * The snapshot is local-only: a loopback Host, or — when the Host's own trust
+ * fence exists — any authority that fence vouches for (`--trusted-host`, a
+ * reverse proxy), or one the operator listed explicitly. Origin and
+ * `Sec-Fetch-Site` are always checked, whatever the Host is.
+ *
+ * @param {any} req
+ * @param {boolean} fenceAvailable
+ */
+function isTrustedRequest(req, fenceAvailable) {
   try {
     const headers = (req && req.headers) || {}
     const host = String(headers.host || '')
     if (!host) return false
     const parsed = new URL('http://' + host)
-    if (!isLoopbackHostname(parsed.hostname) && !isTrustedAuthority(parsed)) return false
+    if (!isLoopbackHostname(parsed.hostname) && !isTrustedAuthority(parsed) && !fenceAvailable) return false
     const site = String(headers['sec-fetch-site'] || '').toLowerCase()
     if (site === 'cross-site') return false
     const origin = headers.origin
@@ -141,6 +168,59 @@ export function apply(ctx) {
   /** @type {Promise<object> | null} */
   let inflight = null
 
+  /**
+   * The Host's own browser-trust fence (Host/Origin spoofing, DNS rebinding, and
+   * the GUI's auth layer). Older Harnesses do not have it, so this stays an
+   * OPTIONAL service: it must never be added to `inject`, or the plugin would
+   * never apply at all on such a Harness.
+   *
+   * Order matters: our own loopback check runs first (so a normal local GUI and
+   * local scripts behave identically), then the Host fence is delegated to when
+   * present — it knows about `--trusted-host` and reverse proxies, which the
+   * plugin cannot. A fence that throws is treated as a rejection (fail-closed).
+   */
+  function connectionFence() {
+    try {
+      const conn = optionalService(ctx, 'connection') || ctx.connection
+      return conn && typeof conn.requestRejection === 'function' ? conn : null
+    } catch {
+      return null
+    }
+  }
+
+  // Say it once at load, not on the first request: on a Harness without the
+  // trust fence, the plugin's own loopback check is the only protection, so a
+  // GUI opened through a LAN address needs the allow-list. No secret involved.
+  if (!connectionFence()) {
+    try {
+      console.warn(
+        '[dsh-balance-pocket] 宿主信任栅栏不可用（connection.requestRejection 缺失）：'
+        + '已启用插件自带的回环/同源校验。若通过局域网地址或反向代理打开 GUI，'
+        + '请用环境变量 DSH_BALANCE_POCKET_TRUSTED_HOSTS 声明允许的 Host（逗号分隔，可带端口）。',
+      )
+    } catch {
+      /* a missing console must not break plugin load */
+    }
+  }
+
+  /** @returns {number | null} rejection status, or null when the request may proceed */
+  function rejectionOf(req) {
+    const fence = connectionFence()
+    // Our own check: a non-loopback Host is only allowed through when the Host
+    // fence exists (it decides which authorities the user actually trusts) or
+    // when the operator listed it explicitly.
+    if (!isTrustedRequest(req, Boolean(fence))) return 403
+    if (!fence) return null
+    let code
+    try {
+      code = fence.requestRejection(req)
+    } catch {
+      return 403
+    }
+    if (code === undefined || code === null || code === false) return null
+    return typeof code === 'number' ? code : 403
+  }
+
   function clientMetadata() {
     return {
       version: String(process.env.DSH_CLIENT_VERSION || process.env.DSH_VERSION || '') || VERSION,
@@ -154,12 +234,26 @@ export function apply(ctx) {
     if (!credentials || typeof credentials.resolve !== 'function') {
       return { status: 'missing', message: '当前 Harness 没有凭据服务' }
     }
-    let credential
-    try {
-      credential = await credentials.resolve('DEEPSEEK_API_KEY')
-    } catch {
-      return { status: 'missing', message: '读取 DEEPSEEK_API_KEY 失败' }
+    // Cold start: the credential service may not be ready yet, and that is not
+    // the same thing as "no key configured". Retry once briefly before deciding.
+    let credential = null
+    let resolveError = false
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        credential = await credentials.resolve('DEEPSEEK_API_KEY')
+        resolveError = false
+        break
+      } catch {
+        resolveError = true
+        if (attempt === 0) {
+          await new Promise((resolve) => {
+            const timer = setTimeout(resolve, CREDENTIAL_RETRY_MS)
+            if (typeof timer.unref === 'function') timer.unref()
+          })
+        }
+      }
     }
+    if (resolveError) return { status: 'missing', message: '读取 DEEPSEEK_API_KEY 失败' }
     if (!credential || !credential.value) return { status: 'missing', message: '未配置 DEEPSEEK_API_KEY' }
 
     let response
@@ -182,16 +276,17 @@ export function apply(ctx) {
     }
     const wallet = pickDeepSeekWallet(data)
     if (!wallet) return { status: 'fail', message: '余额接口没有返回可用钱包' }
-    const total = Number(wallet.total_balance)
-    const toppedUp = Number(wallet.topped_up_balance)
-    const granted = Number(wallet.granted_balance)
+    const total = toAmount(wallet.total_balance)
+    if (total === null) return { status: 'fail', message: '余额接口没有返回可用钱包' }
+    const toppedUp = toAmount(wallet.topped_up_balance)
+    const granted = toAmount(wallet.granted_balance)
     return {
       status: 'ok',
       value: {
         available: true,
         total: round6(total),
-        recharge: Number.isFinite(toppedUp) ? round6(toppedUp) : null,
-        bonus: Number.isFinite(granted) ? round6(granted) : null,
+        recharge: toppedUp === null ? null : round6(toppedUp),
+        bonus: granted === null ? null : round6(granted),
         currency: String(wallet.currency || 'CNY').toUpperCase(),
         source: 'api-key',
         updatedAtMs: Date.now(),
@@ -253,10 +348,13 @@ export function apply(ctx) {
   /**
    * Cached balance read. A transient network failure within the grace window
    * reuses the last good reading instead of flashing an error in the popover.
+   * A failure with no previous good reading is cached only briefly, so a cold
+   * start that raced the credential service recovers on the next poll.
    */
   async function readBalance(force = false) {
     const now = Date.now()
-    if (!force && cached && now - cached.at < BALANCE_TTL_MS) return cached.value
+    const ttl = cached && cached.value && cached.value.available ? BALANCE_TTL_MS : FAILURE_TTL_MS
+    if (!force && cached && now - cached.at < ttl) return cached.value
     if (inflight) return inflight
     inflight = (async () => {
       let value
@@ -322,8 +420,9 @@ export function apply(ctx) {
   }
 
   async function handleSnapshot(req, res) {
-    if (!isTrustedRequest(req)) {
-      res.statusCode = 403
+    const rejection = rejectionOf(req)
+    if (rejection !== null) {
+      res.statusCode = rejection
       res.setHeader('Content-Type', 'text/plain; charset=utf-8')
       res.end('forbidden')
       return

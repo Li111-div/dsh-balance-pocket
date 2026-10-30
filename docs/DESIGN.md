@@ -16,9 +16,10 @@ DeepSeek 余额、峰谷时段和今日已用；外观可配置；凭据绝不�
 ```
 plugin/
   package.json         DSH 插件清单：dsh.bundle.patch + dsh.client
-  cordis.patch.yml     bundle patch：把 Host 半个插件插入 entry list
+  cordis.patch.yml     bundle patch：把 Host 半个插件插入 entry list（含重复挂载守卫）
   index.js             Host：快照路由、余额来源、缓存、后台观测
   peak.js              峰谷时段判定（纯函数）
+  holidays.js          中国法定节假日表（按年份，纯数据）
   ledger.js            余额观测账本（文件 I/O 集中在此，永不向调用方抛错）
   client.js            Client：手写 React，经 window.__ModuleLoader__.load 注册
   locale/{zh,en}.json  插件管理器展示用的标题/描述
@@ -59,7 +60,10 @@ plugin/
     "periodStartAtMs": 1790000000000,
     "nextChangeAtMs": 1790003600000,
     "nextIsPeak": true,
-    "peakMultiplier": 2                  // 仅提示，不参与计费
+    "peakMultiplier": 2,                 // 仅提示，不参与计费
+    "holidayCovered": true,              // false = 该年份不在节假日表里
+    "holidayYear": 2026,
+    "holidayYears": [2025, 2026]
   },
   "today": {
     "day": "2026-10-30",                 // 北京时间日历日
@@ -98,9 +102,12 @@ plugin/
   对每个候选点比较 `isPeakAt(t)` 与 `isPeakAt(t - 1)`，只有真正翻转的点才算
   时段起点 / 下次切换点（`periodStartAtMs` / `nextChangeAtMs`）。
   这样节假日、周末与工作日交界处也能得到正确结果。
-- `HOLIDAYS_2026` 依据国务院 2026 年放假安排，只列**放假不上班**的日期；
-  调休上班的周末不列（周末规则天然按低峰计费）。
-  每年 11 月次年安排公布后补充，并在 `check.mjs` 加边界断言。
+- 节假日表在 `holidays.js`，按年份分组，只列**放假不上班**的日期；调休上班的周末不列
+  （周末规则天然按低峰计费）。当前覆盖 2025–2026。
+- **未覆盖年份必须显式降级**：`peakState()` 返回 `holidayCovered: false` 与 `holidayYear`，
+  快照透传，弹窗显示「节假日表未覆盖 YYYY 年」，`check.mjs` 断言这一点。
+  宁可承认不知道，也不要把假期当工作日（那会让峰谷徽标与实际计费相反）。
+- 每年 11 月国务院公布次年安排后补表，并在 `check.mjs` 补该年份断言（假期首日、末日、节后首个工作日）。
 
 ## 今日已用账本（`ledger.js`）
 
@@ -142,24 +149,34 @@ plugin/
 
 ## 安全模型
 
-1. 路由只信任回环 Host（`localhost` / `127.0.0.0/8` / `::1`），并校验 `Origin` 与 `Sec-Fetch-Site`；
-   局域网/反向代理需要显式设置 `DSH_BALANCE_POCKET_TRUSTED_HOSTS=host:port,...`。
+1. **两层信任**：先做插件自己的轻量校验（Host 必须回环、`Sec-Fetch-Site` 不得为 `cross-site`、
+   带 `Origin` 时必须与 Host 同源），再在 Harness 提供 `connection.requestRejection` 时**委托**它
+   （它知道 `--trusted-host`、反向代理与 GUI 鉴权）；栅栏抛异常一律按拒绝处理（fail-closed）。
+   没有栅栏的老 Harness 才回落到 `DSH_BALANCE_POCKET_TRUSTED_HOSTS` 显式放行列表。
+   `connection` 是**可选服务**（`ctx.get('connection')`），绝不写进 `inject`，否则老宿主上整个插件不会 apply。
 2. 凭据只用于请求 DeepSeek 官方接口，不写响应、日志、错误文案、DOM、账本。
 3. 插件只读：除自己的账本文件外不写任何东西，不读其他插件 DOM，不改 profile。
 4. 无第三方运行时依赖；客户端不加载远程脚本。
 5. 内部错误使用通用文案，不暴露堆栈或路径。
+6. 客户端 fetch 带 15 秒超时，避免挂起请求让界面永远停在「加载中」；
+   复用旧读数时会标注「数据延迟 N 秒」，不把过期值当实时值。
+7. 钱包解析把「字段缺失」与「余额为 0」严格区分：`null` / `''` / 非数字一律视为不可用，
+   绝不渲染成 `¥0.00`。
 
 详见 [SECURITY.md](../SECURITY.md)。
 
 ## 测试（`check.mjs`）
 
-单文件自检，`node check.mjs`（Node >= 18），共 56 项断言：
+单文件自检，`node check.mjs`（Node >= 18），共 72 项断言：
 
 - 峰谷时刻与边界（含毫秒边界、周末、节假日、春节、跨日切换点）；
+- 节假日表结构（年份有序、日期格式与归属年份、每个假期都不判高峰）与**未覆盖年份降级**；
 - 账本规则（跨日、充值平移、乱序、partial 边界、币种隔离、损坏文件、非法金额）；
+- 钱包解析：缺失/null/空串不得当成 0、仅赠金账号可用、同币种充值与赠金相加、CNY 优先；
 - Host 半个插件：真实 `import`、fake Cordis ctx、路由的 403/405/HEAD/200 与凭据不泄露；
+  信任栅栏委托（宿主放行→200、宿主拒绝→沿用状态码、栅栏抛错→403、跨站仍拒绝）；
 - Client 半个插件：stub 模块加载器、三个 slot 注册、设置页渲染与偏好持久化、
-  弹窗各版式/背景渲染、图标按钮数量；
+  弹窗各版式/背景渲染、图标按钮数量、stale 标注与节假日未覆盖提示；
 - 清单与资源：`package.json` 字段、locale JSON、`icon.svg`、patch YAML。
 
 测试通过 `DSH_HOME` 指向临时目录，绝不污染真实账本。
@@ -168,5 +185,8 @@ plugin/
 
 - 针对 2026-10 的 DSH desktop（`sidebar.footer.action` / `shell.overlay` / `settings.section` 等 slot）开发。
   DSH 的 slot 契约变化时，可能需要同步调整注册位置。
-- 峰谷钟点若官方调整，改 `PEAK_RANGES`；节假日表每年 11 月更新。
+- 峰谷钟点若官方调整，改 `PEAK_RANGES`；节假日表（`holidays.js`）每年 11 月更新。
 - 余额来源依赖 DSH 的 `credentials` 与 `deepseekAccount` 服务；任一不可用时自动走另一条路。
+  冷启动时凭据服务可能尚未就绪，会短暂重试一次再判定「未配置」。
+- 重复挂载守卫：`cordis.patch.yml` 的 `disabled: !!js` 表达式会在聚合 bundle 已挂载同名包时
+  退让，避免两条 exact 路由导致启动失败。

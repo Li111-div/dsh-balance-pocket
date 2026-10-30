@@ -55,9 +55,11 @@ GitHub Release 之后也可以直接装 tarball：
 | 峰/谷 | 北京时间：周一至周五（不含中国法定节假日）09:00–12:00、14:00–18:00 为高峰；其余时段为低峰。低峰价 = 高峰价 × 50% |
 | 今日已用 | Host 端按余额观测记账：当日第一次观测 = 开盘余额，之后每次观测更新；`今日已用 = 开盘 − 当前`。跨日重置，不同来源/币种分账本 |
 
-余额快照走本机只读路由 `GET /dsh-balance-pocket/snapshot`（只信任回环 Host；
-如果通过局域网地址/反向代理打开 GUI，需要设置环境变量
-`DSH_BALANCE_POCKET_TRUSTED_HOSTS=myhost.lan:8313`，逗号分隔）。
+余额快照走本机只读路由 `GET /dsh-balance-pocket/snapshot`：先校验回环 Host、`Origin` 与
+`Sec-Fetch-Site`，再委托 DSH 的信任栅栏（`connection.requestRejection`，栅栏抛错按拒绝处理）。
+老版本 DSH 没有栅栏时，可通过环境变量
+`DSH_BALANCE_POCKET_TRUSTED_HOSTS=myhost.lan:8313`（逗号分隔）显式放行 ——
+放行后同网段任何能访问该地址的设备都能读到余额。
 
 账本落在 `$DSH_HOME/dsh-balance-pocket/ledger.json`，不同余额来源（API Key / 账号）
 与不同币种各记一本，互不混算；超过 120 天的记录自动清理。
@@ -78,15 +80,16 @@ Host 每 5 分钟做一次后台观测，插件常驻时一天的数字是连续
 
 ## 维护点
 
-- `peak.js` 的 `HOLIDAYS_2026`：每年 11 月国务院公布次年放假安排后补下一年的日期，
-  否则次年的法定节假日会被当成工作日（周末规则仍自动生效）。
+- 节假日表在 `holidays.js`（按年份）。每年 11 月国务院公布次年放假安排后补下一年：
+  只列**放假不上班**的日期，调休上班的周末不用列（周末规则天然按低峰计费）。
+  表里没有的年份，弹窗会提示「节假日表未覆盖 YYYY 年」，不会默默把假期当工作日。
 - 高峰期钟点若官方调整，改 `peak.js` 的 `PEAK_RANGES`。
 - 价格倍数（低峰 = 高峰 × 0.5）目前只作为 `peakMultiplier` 提示，不参与计费。
 
 ## 开发与自检
 
 ```bash
-node check.mjs   # 56 项：峰谷边界、账本规则、路由安全、客户端渲染
+node check.mjs   # 72 项：峰谷边界、节假日表覆盖、账本规则、路由与信任栅栏、客户端渲染
 ```
 
 ## 文件
@@ -95,10 +98,11 @@ node check.mjs   # 56 项：峰谷边界、账本规则、路由安全、客户�
 |---|---|
 | `index.js` | Host：快照路由、余额解析（API Key / 账号）、缓存与后台观测 |
 | `peak.js` | 峰谷时段判定（纯函数，可独立测试） |
+| `holidays.js` | 中国法定节假日表（按年份，纯数据） |
 | `ledger.js` | 余额观测账本（当日已用、partial、充值平移、分账本） |
 | `client.js` | Client：侧栏底部入口 + 向上弹窗 + 外观设置页（手写 React，无构建） |
 | `locale/*.json` | 插件管理器里的标题/描述（中英） |
-| `cordis.patch.yml` | bundle patch：插入 Host 半个插件 |
+| `cordis.patch.yml` | bundle patch：插入 Host 半个插件（含重复挂载守卫） |
 | `icon.svg` | 插件图标 |
 
 架构与数据契约见仓库的 [docs/DESIGN.md](https://github.com/LMC111-div/dsh-balance-pocket/blob/main/docs/DESIGN.md)。

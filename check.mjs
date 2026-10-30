@@ -130,6 +130,45 @@ check('beijingDay crosses UTC day boundary', () => {
   assert.equal(peak.beijingDay(Date.parse('2026-10-30T16:30:00Z')), '2026-10-31')
 })
 
+// --- holiday calendar coverage --------------------------------------------
+// The peak schedule is only as correct as its holiday table. A year that is
+// missing must be REPORTED (holidayCovered: false), never silently treated as
+// "no holidays" — that would show "off-peak" during a holiday at peak price.
+const holidays = await import(pathToFileURL(path.join(pluginDir, 'holidays.js')).href)
+check('holiday table years are sorted and parseable', () => {
+  assert.ok(holidays.HOLIDAY_YEARS.length >= 2)
+  const sorted = holidays.HOLIDAY_YEARS.slice().sort((a, b) => a - b)
+  assert.deepEqual(holidays.HOLIDAY_YEARS, sorted)
+  for (const year of holidays.HOLIDAY_YEARS) {
+    for (const day of holidays.HOLIDAYS[year]) {
+      assert.match(day, /^\d{4}-\d{2}-\d{2}$/)
+      assert.equal(Number(day.slice(0, 4)), year, 'entry ' + day + ' is filed under ' + year)
+      assert.ok(Number.isFinite(Date.parse(day + 'T00:00:00+08:00')), 'unparseable holiday ' + day)
+    }
+  }
+})
+check('a covered year reports covered', () => {
+  assert.equal(peak.peakState(bj('2026-10-01T10:00:00+08:00')).holidayCovered, true)
+  assert.equal(peak.peakState(bj('2026-10-01T10:00:00+08:00')).holidayYear, 2026)
+})
+check('an uncovered year is flagged, not silently treated as holiday-free', () => {
+  const state = peak.peakState(bj('2027-01-01T10:00:00+08:00'))
+  assert.equal(state.holidayCovered, false)
+  assert.equal(state.holidayYear, 2027)
+})
+check('every listed holiday is never peak', () => {
+  for (const year of holidays.HOLIDAY_YEARS) {
+    for (const day of holidays.HOLIDAYS[year]) {
+      // 10:00 Beijing would be peak on an ordinary weekday.
+      assert.equal(peak.isPeakAt(bj(day + 'T10:00:00+08:00')), false, day + ' must not be peak')
+    }
+  }
+})
+check('uncovered-year weekdays still follow the weekday rule', () => {
+  // 2027-01-04 is a Monday: peak at 10:00 even though the calendar is silent.
+  assert.equal(peak.isPeakAt(bj('2027-01-04T10:00:00+08:00')), true)
+})
+
 // --- ledger ----------------------------------------------------------------
 const { createLedger } = await import(pathToFileURL(path.join(pluginDir, 'ledger.js')).href)
 const ledger = createLedger(() => bj('2026-10-30T12:00:00+08:00'))
@@ -206,6 +245,45 @@ check('Host half exports apply + inject', () => {
   assert.deepEqual(host.inject, ['webServer'])
 })
 
+// --- wallet selection (pure, and the one place a missing field could be
+// misread as "balance is zero") --------------------------------------------
+check('api-key wallet: missing/null amounts are not read as 0', () => {
+  assert.equal(host.pickDeepSeekWallet({ balance_infos: [{ currency: 'CNY', total_balance: null }] }), null)
+  assert.equal(host.pickDeepSeekWallet({ balance_infos: [{ currency: 'CNY', total_balance: '' }] }), null)
+  assert.equal(host.pickDeepSeekWallet({ balance_infos: [{ currency: 'CNY' }] }), null)
+  assert.equal(host.pickDeepSeekWallet({ balance_infos: [] }), null)
+  assert.equal(host.pickDeepSeekWallet(null), null)
+})
+check('api-key wallet: prefers a non-zero CNY wallet, then any non-zero, then CNY', () => {
+  const cny = { currency: 'CNY', total_balance: '12.5' }
+  const usdZero = { currency: 'USD', total_balance: 0 }
+  assert.equal(host.pickDeepSeekWallet({ balance_infos: [usdZero, cny] }), cny)
+  const usd = { currency: 'USD', total_balance: 3 }
+  assert.equal(host.pickDeepSeekWallet({ balance_infos: [usd, cny] }), cny)
+  assert.equal(host.pickDeepSeekWallet({ balance_infos: [{ currency: 'USD', total_balance: 0 }, usd] }), usd)
+})
+check('account wallets: bonus-only account is usable', () => {
+  const picked = host.pickAccountWallets([], [{ currency: 'CNY', balance: 4.5 }])
+  assert.equal(picked.total, 4.5)
+  assert.equal(picked.recharge, 0)
+  assert.equal(picked.bonus, 4.5)
+})
+check('account wallets: recharge and bonus of the same currency are summed', () => {
+  const picked = host.pickAccountWallets(
+    [{ currency: 'CNY', balance: 10 }, { currency: 'USD', balance: 99 }],
+    [{ currency: 'CNY', balance: 2.5 }],
+  )
+  assert.equal(picked.currency, 'CNY')
+  assert.equal(picked.recharge, 10)
+  assert.equal(picked.bonus, 2.5)
+  assert.equal(picked.total, 12.5)
+})
+check('account wallets: nothing usable means null, not 0', () => {
+  assert.equal(host.pickAccountWallets([], []), null)
+  assert.equal(host.pickAccountWallets(null, null), null)
+  assert.equal(host.pickAccountWallets([{ currency: 'CNY', balance: null }], []), null)
+})
+
 // --- snapshot route through a fake Cordis ctx ------------------------------
 function makeRes() {
   return {
@@ -279,6 +357,8 @@ if (routeHandler) {
     assert.ok(payload.serverNowMs > 0)
     assert.equal(typeof payload.peak.isPeak, 'boolean')
     assert.equal(payload.peak.peakMultiplier, 2)
+    assert.equal(typeof payload.peak.holidayCovered, 'boolean')
+    assert.ok(Array.isArray(payload.peak.holidayYears) && payload.peak.holidayYears.length > 0)
     assert.ok(payload.today && typeof payload.today.day === 'string')
     assert.equal(payload.today.source, 'balance-observation')
     assert.ok(payload.balance && typeof payload.balance.available === 'boolean')
@@ -287,6 +367,47 @@ if (routeHandler) {
     for (const needle of ['sk-', 'bearer ', 'authorization', 'token']) {
       assert.ok(text.indexOf(needle) === -1, 'snapshot must not leak "' + needle + '"')
     }
+  })
+}
+
+// --- Host trust fence delegation ------------------------------------------
+// When the Harness exposes connection.requestRejection, the plugin delegates to
+// it (it knows --trusted-host / reverse proxies) and fails CLOSED if it throws.
+async function handlerWith(fence) {
+  const routes = []
+  const ctx = {
+    effect(fn) { const dispose = fn(); return () => { if (typeof dispose === 'function') dispose() } },
+    get(name) { return name === 'connection' ? fence : undefined },
+    webServer: { register(route) { routes.push(route); return () => {} } },
+  }
+  host.apply(ctx)
+  return routes[0].handler
+}
+
+if (host && typeof host.apply === 'function') {
+  await checkAsync('a trusted non-loopback Host is allowed when the Host fence vouches for it', async () => {
+    const handler = await handlerWith({ requestRejection() { return null } })
+    const res = makeRes()
+    await handler(makeReq({ headers: { host: 'myhost.lan:8313' } }), res)
+    assert.equal(res.statusCode, 200)
+  })
+  await checkAsync('a rejected request from the Host fence keeps its status code', async () => {
+    const handler = await handlerWith({ requestRejection() { return 401 } })
+    const res = makeRes()
+    await handler(makeReq(), res)
+    assert.equal(res.statusCode, 401)
+  })
+  await checkAsync('a throwing Host fence fails closed', async () => {
+    const handler = await handlerWith({ requestRejection() { throw new Error('boom') } })
+    const res = makeRes()
+    await handler(makeReq(), res)
+    assert.equal(res.statusCode, 403)
+  })
+  await checkAsync('cross-site stays rejected even when the fence is present', async () => {
+    const handler = await handlerWith({ requestRejection() { return null } })
+    const res = makeRes()
+    await handler(makeReq({ headers: { host: 'myhost.lan:8313', 'sec-fetch-site': 'cross-site' } }), res)
+    assert.equal(res.statusCode, 403)
   })
 }
 
@@ -716,6 +837,60 @@ if (clientConfig) {
     assert.equal(parsed.background, 'acrylic')
     assert.equal(typeof parsed.opacity, 'number')
     assert.equal(typeof parsed.blur, 'number')
+  })
+
+  // The popover header's refresh button is the public way to re-read the snapshot.
+  // The stub's effects are no-ops, so no poll runs here: close the card first
+  // (which clears `loading`) and then hit refresh while it is still mounted for
+  // its exit animation.
+  const flush = function () {
+    return new Promise((resolve) => setTimeout(resolve, 0))
+  }
+  const clickButton = function (tree, label) {
+    const button = find(tree, (node) => node.type === 'button' && node.props['aria-label'] === label)[0]
+    assert.ok(button, 'button missing: ' + label)
+    button.props.onClick({ preventDefault() {}, stopPropagation() {} })
+    return button
+  }
+  const loadWith = async function (snapshotPayload) {
+    const original = globalThis.fetch
+    globalThis.fetch = async function () {
+      return { ok: true, status: 200, json: async () => snapshotPayload }
+    }
+    try {
+      clickButton(captured['balance-pocket-popover']({}), '关闭')
+      await flush()
+      const button = clickButton(captured['balance-pocket-popover']({}), '刷新')
+      assert.notEqual(button.props.disabled, true, 'refresh button should be enabled once the load settled')
+      await flush()
+      await flush()
+    } finally {
+      globalThis.fetch = original
+    }
+  }
+
+  await checkAsync('a stale cached balance is labelled, not shown as live', async () => {
+    const stalePayload = JSON.parse(JSON.stringify(payload))
+    stalePayload.balance.stale = true
+    stalePayload.balance.staleMs = 125000
+    await loadWith(stalePayload)
+    assert.ok(texts(captured['balance-pocket-popover']({})).join(' ').indexOf('延迟') >= 0, 'stale reading was not labelled')
+    // Restore a live payload so later layout checks start from a known state.
+    await loadWith(payload)
+    assert.ok(texts(captured['balance-pocket-popover']({})).join(' ').indexOf('延迟') === -1, 'stale note survived a live reading')
+  })
+
+  await checkAsync('an uncovered holiday year is warned about', async () => {
+    const uncovered = JSON.parse(JSON.stringify(payload))
+    uncovered.peak.holidayCovered = false
+    uncovered.peak.holidayYear = 2027
+    await loadWith(uncovered)
+    assert.ok(texts(captured['balance-pocket-popover']({})).join(' ').indexOf('节假日表未覆盖') >= 0, 'missing holiday coverage was not surfaced')
+    await loadWith(payload)
+    // Re-open the popover for the checks that follow.
+    find(captured['balance-pocket']({ wide: true }), (node) => node.type === 'button')[0]
+      .props.onClick({ preventDefault() {}, stopPropagation() {} })
+    await flush()
   })
 
   // Dispose every registered effect (timers included) so the run can exit.

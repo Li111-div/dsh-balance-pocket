@@ -12,6 +12,7 @@ window.__ModuleLoader__.load({
     const POPOVER_ID = 'balance-pocket-popover'
     const SNAPSHOT_URL = '/dsh-balance-pocket/snapshot'
     const POLL_INTERVAL_MS = 30000
+    const FETCH_TIMEOUT_MS = 15000
     const POPOVER_WIDTH = 280
     const POPOVER_GAP = 8
     const VIEWPORT_EDGE = 8
@@ -97,6 +98,8 @@ window.__ModuleLoader__.load({
         showSecondsHint: '关闭后倒计时只显示 HH:MM',
         previewLive: '实时',
         previewHint: '设置同时作用于弹窗与侧栏入口，无需重启。',
+        staleHint: '数据延迟 {seconds} 秒',
+        holidayUncovered: '节假日表未覆盖 {year} 年，假期可能被当作工作日',
       },
       en: {
         title: 'DeepSeek balance',
@@ -146,6 +149,8 @@ window.__ModuleLoader__.load({
         showSecondsHint: 'Off shows HH:MM only',
         previewLive: 'Live',
         previewHint: 'Applies to the popover and the sidebar entry instantly.',
+        staleHint: 'Delayed by {seconds}s',
+        holidayUncovered: 'Holiday calendar does not cover {year}; holidays may count as workdays',
       },
     }
 
@@ -428,6 +433,11 @@ window.__ModuleLoader__.load({
           cache: 'no-store',
           credentials: 'same-origin',
           headers: { Accept: 'application/json' },
+          // A hung request must not leave the UI stuck in "loading" forever with
+          // the refresh button disabled; time out and surface the retry affordance.
+          signal: typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+            ? AbortSignal.timeout(FETCH_TIMEOUT_MS)
+            : undefined,
         })
       } catch (error) {
         if (token === requestToken) {
@@ -1251,7 +1261,10 @@ window.__ModuleLoader__.load({
         justifyContent: wide ? 'flex-start' : 'center',
         gap: 8,
         boxSizing: 'border-box',
-        width: wide ? '100%' : 32,
+        // The footer row is shared with every other plugin's occupant, so take
+        // only the space that is offered instead of a hard 100% basis.
+        flex: wide ? '1 1 auto' : '0 0 auto',
+        width: wide ? 'auto' : 32,
         minWidth: 32,
         height: 32,
         padding: wide ? '0 9px' : 0,
@@ -1597,6 +1610,15 @@ window.__ModuleLoader__.load({
         const showSource = appearance.showSource !== false
         const showSeconds = appearance.showSeconds !== false
         const showNote = appearance.showObservedSince !== false && !!today && today.partial === true && !!observedFrom
+        const staleSeconds =
+          balance && balance.stale === true && typeof balance.staleMs === 'number' && isFinite(balance.staleMs)
+            ? Math.max(1, Math.round(balance.staleMs / 1000))
+            : null
+        const staleNote = staleSeconds === null ? null : t('staleHint', { seconds: staleSeconds })
+        const holidayWarning =
+          peak && peak.holidayCovered === false
+            ? t('holidayUncovered', { year: peak.holidayYear || new Date(serverNowMs).getFullYear() })
+            : null
 
         const dot = function (key) {
           return h('span', {
@@ -1770,6 +1792,28 @@ window.__ModuleLoader__.load({
               { key: 'stale', style: { paddingTop: 10, display: 'flex', alignItems: 'center', gap: 8 } },
               h('span', { style: { fontSize: 11, color: COLOR.labelTertiary } }, t('loadFailed')),
               h(RetryButton, { label: t('retry'), onClick: loadSnapshot })
+            )
+          )
+        }
+        // A cached reading reused after a failed refresh is NOT live data; say
+        // so instead of rendering it as if it were current.
+        if (staleNote) {
+          sections.push(
+            h(
+              'div',
+              { key: 'staleAge', style: { paddingTop: 8, fontSize: 11, lineHeight: '16px', color: COLOR.labelTertiary } },
+              staleNote
+            )
+          )
+        }
+        // Holidays in a year the calendar does not cover are classified as
+        // ordinary workdays; warn rather than present a wrong badge.
+        if (holidayWarning) {
+          sections.push(
+            h(
+              'div',
+              { key: 'holiday', style: { paddingTop: 8, fontSize: 11, lineHeight: '16px', color: COLOR.warn } },
+              holidayWarning
             )
           )
         }

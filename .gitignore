@@ -23,8 +23,3 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
-
-# Local test leftovers
-probe.txt
-acl-recovery-*/
-acl-backup-*.json
