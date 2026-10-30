@@ -8,7 +8,7 @@ English summary at the bottom.
 鍙備笌鏈」鐩嵆琛ㄧず鍚屾剰閬靛畧 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)銆?
 ## 鎶ュ憡闂
 
-- **Bug / 鍔熻兘寤鸿**锛氫娇鐢?[Issue 妯℃澘](https://github.com/Llii-div/dsh-balance-pocket/issues/new/choose)銆?- **瀹夊叏婕忔礊**锛氫笉瑕佸紑鍏紑 Issue锛岃鎸?[SECURITY.md](SECURITY.md) 绉佷笅鎶ュ憡銆?- 鎻?Issue 鍓嶈鍏堟悳绱㈡槸鍚﹀凡鏈夌浉鍚岄棶棰橈紱闄勪笂 DSH 鐗堟湰銆佹搷浣滅郴缁熴€佸鐜版楠わ紝浠ュ強**鑴辨晱鍚庣殑**閿欒淇℃伅銆?  璇蜂笉瑕佽创 `DEEPSEEK_API_KEY`銆佽处鍙?token 鎴栧畬鏁寸殑 `ledger.json`銆?
+- **Bug / 鍔熻兘寤鸿**锛氫娇鐢?[Issue 妯℃澘](https://github.com/Li111-div/dsh-balance-pocket/issues/new/choose)銆?- **瀹夊叏婕忔礊**锛氫笉瑕佸紑鍏紑 Issue锛岃鎸?[SECURITY.md](SECURITY.md) 绉佷笅鎶ュ憡銆?- 鎻?Issue 鍓嶈鍏堟悳绱㈡槸鍚﹀凡鏈夌浉鍚岄棶棰橈紱闄勪笂 DSH 鐗堟湰銆佹搷浣滅郴缁熴€佸鐜版楠わ紝浠ュ強**鑴辨晱鍚庣殑**閿欒淇℃伅銆?  璇蜂笉瑕佽创 `DEEPSEEK_API_KEY`銆佽处鍙?token 鎴栧畬鏁寸殑 `ledger.json`銆?
 ## 寮€鍙戠幆澧?
 - Node.js **>= 18**锛堝彧鐢ㄤ簬鑷锛屾彃浠舵湰韬病鏈夎繍琛屾椂渚濊禆锛夈€?- 涓嶉渶瑕?`npm install`锛屼篃娌℃湁鏋勫缓姝ラ銆?- 缂栬緫鍣ㄥ缓璁紑鍚?EditorConfig锛涗粨搴撳凡鎻愪緵 `.editorconfig`銆?
 ```bash

@@ -11,7 +11,7 @@
 
 **璇蜂笉瑕佸紑鍏紑 Issue銆?* 璇蜂娇鐢?GitHub 鐨勭瀵嗘紡娲炴姤鍛婏細
 
-馃憠 https://github.com/Llii-div/dsh-balance-pocket/security/advisories/new
+馃憠 https://github.com/Li111-div/dsh-balance-pocket/security/advisories/new
 
 鎶ュ憡閲岃鍖呭惈锛氬彈褰卞搷鐨勭増鏈€佸鐜版楠ゃ€佸奖鍝嶆弿杩帮紝浠ュ強锛堝鏈夛級鏈€灏?PoC銆?**涓嶈**闄勫甫鐪熷疄鐨?`DEEPSEEK_API_KEY`銆佽处鍙?token 鎴栧畬鏁磋处鏈枃浠讹紱濡傞渶灞曠ず锛岃鎵撶爜鎴栦娇鐢ㄤ吉閫犲€笺€?
 鎴戜細灏藉揩纭鏀跺埌骞惰瘎浼板奖鍝嶏紱淇鍙戝竷鍚庝細鍦?Advisory 涓?CHANGELOG 涓嚧璋紙闄ら潪浣犲笇鏈涘尶鍚嶏級銆?
@@ -30,7 +30,7 @@
 ## English
 
 Report vulnerabilities privately via GitHub Security Advisories
-(https://github.com/Llii-div/dsh-balance-pocket/security/advisories/new), never in a public issue.
+(https://github.com/Li111-div/dsh-balance-pocket/security/advisories/new), never in a public issue.
 Do not include real API keys or tokens. Supported versions: 0.1.x.
 
 Security contract: credentials never leave the Host process and never appear in responses/logs/DOM;

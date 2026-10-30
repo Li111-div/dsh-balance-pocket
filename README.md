@@ -6,9 +6,9 @@
 
 **鍦?DSH 渚ф爮搴曢儴锛岄殢鎵嬬湅涓€鐪?DeepSeek 浣欓銆佸嘲璋锋椂娈靛拰浠婂ぉ鑺变簡澶氬皯銆?*
 
-[![CI](https://github.com/Llii-div/dsh-balance-pocket/actions/workflows/ci.yml/badge.svg)](https://github.com/Llii-div/dsh-balance-pocket/actions/workflows/ci.yml)
+[![CI](https://github.com/Li111-div/dsh-balance-pocket/actions/workflows/ci.yml/badge.svg)](https://github.com/Li111-div/dsh-balance-pocket/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![DSH plugin](https://img.shields.io/badge/DSH-plugin-4b6bfb.svg)](https://github.com/Llii-div/dsh-balance-pocket)
+[![DSH plugin](https://img.shields.io/badge/DSH-plugin-4b6bfb.svg)](https://github.com/Li111-div/dsh-balance-pocket)
 
 [![涓枃](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-2ea44f.svg)](#%E4%B8%AD%E6%96%87)
 [![English](https://img.shields.io/badge/README-English-8250df.svg)](#english)
@@ -55,14 +55,14 @@
 
 鍙戝竷 GitHub Release 涔嬪悗锛屼篃鍙互鐩存帴瑁?`.tgz`锛?
 ```json
-"dsh-balance-pocket": "https://github.com/Llii-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
+"dsh-balance-pocket": "https://github.com/Li111-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
 ```
 
 鍙戝竷椤靛悓鏃舵彁渚?`SHA256SUMS.txt` 渚涙牎楠屻€?
 **鏂瑰紡 C锛氬紑鍙戞ā寮?*
 
 ```bash
-git clone https://github.com/Llii-div/dsh-balance-pocket.git
+git clone https://github.com/Li111-div/dsh-balance-pocket.git
 # 鍦?profile 閲?link 鍒版湰浠撳簱鐨?plugin/锛屾敼瀹屽埛鏂扮晫闈㈠嵆鍙?```
 
 > 鏈彃浠朵笉闇€瑕?`npm install`锛屼篃娌℃湁鏋勫缓浜х墿锛沗plugin/` 鐩綍鏈韩灏辨槸瀹屾暣鐨勫寘銆?
@@ -98,7 +98,7 @@ docs/DESIGN.md      鏋舵瀯涓庢暟鎹绾?```
 
 璐＄尞鍓嶈闃呰 [CONTRIBUTING.md](CONTRIBUTING.md)锛涘畨鍏ㄩ棶棰樿鎸?[SECURITY.md](SECURITY.md) 绉佷笅鎶ュ憡銆?
 ### 璁稿彲璇?
-[MIT](LICENSE) 漏 2026 Llii-div
+[MIT](LICENSE) 漏 2026 Li111-div
 
 ---
 
@@ -134,7 +134,7 @@ Alternatively add it to `$DSH_HOME/profiles/<profile>/package.json`:
 or, after a GitHub release, use the packaged tarball:
 
 ```json
-"dsh-balance-pocket": "https://github.com/Llii-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
+"dsh-balance-pocket": "https://github.com/Li111-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
 ```
 
 Each release also ships `SHA256SUMS.txt` for verification.
@@ -168,4 +168,4 @@ No build step: `plugin/client.js` is hand-written React loaded through DSH's mod
 
 ### License
 
-[MIT](LICENSE) 漏 2026 Llii-div
+[MIT](LICENSE) 漏 2026 Li111-div

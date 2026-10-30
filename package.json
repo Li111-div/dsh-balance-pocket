@@ -4,15 +4,15 @@
   "private": true,
   "description": "DSH sidebar balance pocket plugin 鈥?repository root. The installable DSH package lives in plugin/.",
   "license": "MIT",
-  "author": "Llii-div",
+  "author": "Li111-div",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Llii-div/dsh-balance-pocket.git"
+    "url": "git+https://github.com/Li111-div/dsh-balance-pocket.git"
   },
   "bugs": {
-    "url": "https://github.com/Llii-div/dsh-balance-pocket/issues"
+    "url": "https://github.com/Li111-div/dsh-balance-pocket/issues"
   },
-  "homepage": "https://github.com/Llii-div/dsh-balance-pocket#readme",
+  "homepage": "https://github.com/Li111-div/dsh-balance-pocket#readme",
   "scripts": {
     "test": "node check.mjs"
   },

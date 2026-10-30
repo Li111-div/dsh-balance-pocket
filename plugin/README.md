@@ -8,7 +8,7 @@ DeepSeek Harness锛圖SH锛塛eb/妗岄潰绔彃浠躲€傚乏渚ф爮搴曢
 - **浠婃棩宸茬敤**锛氭寜浣欓鍙樺寲瑙傛祴鍑虹殑鐪熷疄鎵ｈ垂锛涜娴嬩笉瀹屾暣鏃舵爣娉ㄣ€岃嚜 HH:mm 璧疯娴嬨€嶃€?
 涓嶆柊寤虹嫭绔嬮〉闈€佷笉鍗犱富闈㈡澘銆傚脊绐楁墦寮€鏃舵瘡 30 绉掑埛鏂颁竴娆★紝涔熷彲鎵嬪姩鍒锋柊锛?鍏抽棴寮圭獥鍚庡仠姝㈣疆璇笌鍊掕鏃讹紝渚ф爮鐘舵€佺偣鏀逛负 60 绉掍綆棰戝埛鏂般€傚瑙傦紙鑳屾櫙 / 鐗堝紡 / 鏄剧ず椤癸級鍦?**璁剧疆 鈫?浣欓灏忓彛琚?* 閲岃皟鏁达紝
 甯﹀疄鏃堕瑙堬紝鏀瑰姩绔嬪嵆鐢熸晥骞朵繚瀛樺湪褰撳墠娴忚鍣ㄣ€?
-> 浠撳簱銆侀棶棰樺弽棣堛€佽础鐚寚鍗楋細https://github.com/Llii-div/dsh-balance-pocket
+> 浠撳簱銆侀棶棰樺弽棣堛€佽础鐚寚鍗楋細https://github.com/Li111-div/dsh-balance-pocket
 
 ## 鍔熻兘
 
@@ -34,7 +34,7 @@ profile 渚濊禆绀轰緥锛?
 
 GitHub Release 涔嬪悗涔熷彲浠ョ洿鎺ヨ tarball锛?
 ```json
-"dsh-balance-pocket": "https://github.com/Llii-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
+"dsh-balance-pocket": "https://github.com/Li111-div/dsh-balance-pocket/releases/download/v0.1.0/dsh-balance-pocket-0.1.0.tgz"
 ```
 
 鏈彃浠舵病鏈夎繍琛屾椂渚濊禆锛屼篃涓嶉渶瑕?`npm install` 鎴栨瀯寤恒€?
@@ -75,7 +75,7 @@ node check.mjs   # 72 椤癸細宄拌胺杈圭晫銆佽妭鍋囨棩琛ㄨ鐩�
 | `cordis.patch.yml` | bundle patch锛氭彃鍏?Host 鍗婁釜鎻掍欢锛堝惈閲嶅鎸傝浇瀹堝崼锛?|
 | `icon.svg` | 鎻掍欢鍥炬爣 |
 
-鏋舵瀯涓庢暟鎹绾﹁浠撳簱鐨?[docs/DESIGN.md](https://github.com/Llii-div/dsh-balance-pocket/blob/main/docs/DESIGN.md)銆?
+鏋舵瀯涓庢暟鎹绾﹁浠撳簱鐨?[docs/DESIGN.md](https://github.com/Li111-div/dsh-balance-pocket/blob/main/docs/DESIGN.md)銆?
 ## English
 
 A DSH Web/desktop plugin: a coin entry at the sidebar foot opens an upward popover with the live
@@ -92,4 +92,4 @@ Run `node check.mjs` for the self-check. Licensed under MIT.
 
 ## License
 
-MIT 漏 2026 Llii-div 鈥?see [LICENSE](LICENSE).
+MIT 漏 2026 Li111-div 鈥?see [LICENSE](LICENSE).
